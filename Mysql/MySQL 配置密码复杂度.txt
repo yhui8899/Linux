@@ -1,0 +1,54 @@
+MySQL 配置密码复杂度
+1.mysql 5.7.15版本好像默认启用了密码复杂度设置，插件名字叫做 validate_password，如果没有安装
+mysql>>INSTALL PLUGIN validate_password SONAME 'validate_password.so';
+
+
+2.在/etc/my.cnf加上配置,并重启mysql
+[mysqld]
+plugin-load=validate_password.so
+validate_password_policy=0
+validate-password=FORCE_PLUS_PERMANENT
+
+ 3.登陆数据库查看
+mysql> show variables like 'validate%';
++--------------------------------------+-------+
+| Variable_name                       	    | Value |
++--------------------------------------+-------+
+| validate_password_dictionary_file  	    |       |
+| validate_password_length            	    | 8     |
+| validate_password_mixed_case_count   | 1     |
+| validate_password_number_count         | 1     |
+| validate_password_policy                      | LOW   |
+| validate_password_special_char_count  | 1     |
++--------------------------------------+-------+
+6 rows in set (0.00 sec)
+ 
+解释：
+1、validate_password_policy
+代表的密码策略，可配置的值有以下：默认是MEDIUM
+
+0 or LOW 仅需需符合密码长度（由参数validate_password_length指定）
+
+1 or MEDIUM 满足LOW策略，同时还需满足至少有1个数字，小写字母，大写字母和特殊字符
+
+2 or STRONG 满足MEDIUM策略，同时密码不能存在字典文件（dictionary file）中
+ 
+2、validate_password_dictionary_file
+# 用于配置密码的字典文件，当validate_password_policy设置为STRONG时可以配置密码字典文件，字典文件中存在的密码不得使用。
+ 
+3、validate_password_length
+# 用来设置密码的最小长度，默认值是8最小是0
+ 
+4、validate_password_mixed_case_count   
+# 当validate_password_policy设置为MEDIUM或者STRONG时，密码中至少同时拥有的小写和大写字母的数量，默认是1最小是0；默认是至少拥有一个小写和一个大写字母。
+ 
+5、validate_password_number_count     
+# 当validate_password_policy设置为MEDIUM或者STRONG时，密码中至少拥有的数字的个数，默认1最小是0
+ 
+6、validate_password_special_char_count
+# 当validate_password_policy设置为MEDIUM或者STRONG时，密码中至少拥有的特殊字符的个数，默认1最小是0
+
+mysql> set global validate_password_policy=0;       # 关闭密码复杂性策略
+mysql> set global validate_password_length=1;      # 设置密码复杂性要求密码最低长度为1
+mysql> select @@validate_password_policy;          # 查看密码复杂性策略
+mysql> select @@validate_password_length;          # 查看密码复杂性要求密码最低长度大小
