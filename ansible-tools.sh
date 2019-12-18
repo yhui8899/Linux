@@ -1,6 +1,6 @@
 #!/bin/bash
-# Author: liaojunhua
-# QQ: 563293401
+# Author: xiaofeige
+# QQ: 355638930
 # ansible update shell
 
 # Source function library.
