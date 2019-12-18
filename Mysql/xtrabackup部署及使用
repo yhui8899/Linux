@@ -1,0 +1,58 @@
+下载xtrabackup软件包
+wget https://www.percona.com/downloads/Percona-XtraBackup-LATEST/Percona-XtraBackup-8.0-7/source/tarball/percona-xtrabackup-8.0.7.tar.gz
+
+yum install numactl -y   #安装依赖
+
+tar xf percona-xtrabackup-2.4.8-Linux-x86_64.tar.gz -C /usr/local/
+
+ mv /usr/local/percona-xtrabackup-2.4.8-Linux-x86_64/ /usr/local/xtrabackup
+echo "export PATH=$PATH:/usr/local/xtrabackup/bin" >> /etc/profile
+
+source /etc/profile
+yum install numactl -y   #安装依赖
+
+
+----全量备份
+
+备份数据存放在/data/backup/下面，innobackupex会自动创建一个文件夹+当前系统的时间戳
+innobackupex --defaults-file=/etc/my.cnf --user=root --password=123456 --socket=/data/mysqldata/mysqld.sock /data/backup/full   
+
+
+备份目录下的文件各文件说明：
+(1) backup-my.cnf —— 备份命令用到的配置选项信息；
+
+(2) ibdata1 —— 备份的表空间文件；
+
+(3) xtrabackup_binary —— 备份中用到的xtrabackup的可执行文件；
+
+(4) xtrabackup_binlog_info —— mysql服务器当前正在使用的二进制日志文件及至备份这一刻为止二进制日志事件的位置；
+
+(5) xtrabackup_checkpoints —— 备份类型（如完全或增量）、备份状态（如是否已经为prepared状态）和LSN(日志序列号)范围信息；
+
+6) xtrabackup_logfile —— 备份的重做日志文件。 
+
+
+二、数据库恢复，步骤如下：
+1、停止数据库
+systemctl stop mysql
+
+2、执行如下恢复命令：
+innobackupex --defaults-file=/etc/my.cnf  --copy-back --rsync /data/backup/2019-09-23_22-41-54
+
+3、执行如下命令：
+innobackupex --apply-log   /data1/backup/2019-09-23_22-41-54
+一般情况下，在备份完成后，数据尚且不能用于恢复操作，因为备份的数据中可能会包含尚未提交的事务或已经提交但尚未同步至数据文件中的事务。因此，此时数据文件仍处理不一致状态。“准备”的主要作用正是通过回滚未提交的事务及同步已经提交的事务至数据文件也使得数据文件处于一致性状态。读取备份文件夹中的配置文件，然后innobackupex重做已提交事务，回滚未提交事务，之后数据就被写到了备份的数据文件(innodb文件)中，并重建日志文件
+
+4、启动数据库
+systemctl start mysql
+
+注意：数据恢复至DATADIR目录以后，还需要确保所有数据文件的属主和属组均为正确的用户，如mysql，否则，在启动mysqld之前还需要事先修改数据文件的属主和属组
+chown -R mysql:mysql /data/mysql
+
+
+
+
+
+
+
+
