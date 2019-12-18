@@ -1,0 +1,21 @@
+FROM centos:7
+MAINTAINER xiaofeige
+RUN 	yum install -y gcc gcc-c++ pcre pcre-devel openssl openssl-devel \
+	wget vim make net-tools curl gd-devel && \
+	yum clean all && \
+	rm -rf /var/cache/yum/*
+RUN	wget  http://nginx.org/download/nginx-1.15.5.tar.gz && \
+	tar -xf nginx-1.15.5.tar.gz && \
+	cd  nginx-1.15.5 && \
+	./configure --prefix=/usr/local/nginx \
+	--with-http_ssl_module \
+	--with-http_stub_status_module && \
+	make && make install && \
+	rm -rf /usr/local/nginx/html/* && \
+	echo "ok" >/usr/local/nginx/html/index.html
+COPY  nginx.conf /usr/local/nginx/conf
+ENV PATH $PATH:/usr/local/nginx/sbin
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+
+
