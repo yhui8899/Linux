@@ -1,0 +1,81 @@
+Redis缓存服务器命令行中常用命令如下：
+
+	Redis  CONFIG 命令格式如下：
+
+	redis 127.0.0.1:6379> CONFIG  GET|SET CONFIG_SETTING_NAME
+
+	CONFIG  GET * 			获取Redis服务器所有配置信息；
+
+	CONFIG  SET  loglevel  "notice"   	设置Redis服务器日志级别；
+
+	CONFIG  SET  requirepass  "jfedu"
+
+	AUTH   jfedu
+
+	redis-cli  -h host  -p  port  -a  password 	远程连接redis数据库；
+
+	CLIENT GETNAME 			获取连接的名称;
+
+	CLIENT SETNAME 			设置当前连接的名称;
+
+	CLUSTER SLOTS 			获取集群节点的映射数组;
+
+	COMMAND 					获取Redis命令详情数组;
+
+	COMMAND COUNT 		    获取 Redis 命令总数;
+
+	COMMAND GETKEYS 		获取给定命令的所有键;
+
+	TIME 				返回当前服务器时间;
+
+	CONFIG GET parameter 		获取指定配置参数的值;
+
+	CONFIG SET parameter value		修改redis 配置参数，无需重启;
+
+	CONFIG RESETSTAT 			重置 INFO 命令中的某些统计数据;
+
+	DBSIZE 				返回当前数据库的 key 的数量;
+
+	DEBUG OBJECT key 			获取 key 的调试信息;
+
+	DEBUG SEGFAULT 			让Redis服务崩溃;
+
+	FLUSHALL 			删除所有数据库的所有key;
+
+	FLUSHDB 				删除当前数据库的所有key;
+
+	ROLE 				返回主从实例所属的角色;
+
+	SAVE 				异步保存数据到硬盘;
+
+	SHUTDOWN 			异步保存数据到硬盘，并关闭服务器;
+
+	SLOWLOG  			管理 redis 的慢日志;
+
+	SET  keys  values			设置key为jfedu，值为123；
+
+	DEL  jfedu  			删除key及值；
+
+	INFO  CPU   			查看服务器CPU占用信息；
+
+	KEYS  jfedu  			查看是存在jfedu的key；
+
+	KEYS  *     			查看Redis所有的KEY；
+
+	CONFIG REWRITE 			启动 Redis时所指定的redis.conf 配置文件进行改写;
+
+	INFO [section] 			获取Redis服务器的各种信息和统计数值;
+
+	SYNC 				用于复制功能(replication)的内部命令;
+
+	SLAVEOF host port 			指定服务器的从属服务器(slave server);
+
+	MONITOR 			实时打印出Redis服务器接收到的命令，调试用;
+
+	LASTSAVE 			返回最近一次Redis成功将数据保存到磁盘上的时间;;
+
+	CLIENT PAUSE timeout		指定时间内终止运行来自客户端的命令;
+
+	BGREWRITEAOF 		   	异步执行一个 AOF（AppendOnly File） 文件重写操作;
+
+	BGSAVE 				后台异步保存当前数据库的数据到磁盘。

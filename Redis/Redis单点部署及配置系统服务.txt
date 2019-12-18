@@ -1,0 +1,77 @@
+IP：192.168.199.10
+环境：centos7.4
+Redis版本：Redis-5.0.5
+安装目录：/usr/local/redis
+用户：root
+
+编译和安装所需的包：
+yum  install gcc tcl 
+
+下载Redis5.0.5安装包
+cd /usr/local/src
+wget -c http://download.redis.io/releases/redis-5.0.5.tar.gz
+tar -xf redis-5.0.5.tar.gz
+cd redis-5.0.5
+
+安装（使用PREFIX指定安装目录）：
+make PREFIX=/usr/local/redis install
+安装完成后，可以看到/usr/local/redis目录下有一个bin目录，bin目录里就是Redis的命令脚本如下：
+（redis-benchmark、redis-check-aof、redis-check-dump 、redis-cli、redis-server）
+
+将Redis配置成服务
+将上面的操作步骤。Redis的启动脚本为：/usr/local/src/redis5.0.5/utils/redis_init_script，将启动脚本复制到/etc/init.d/目录下，并命名为：redis:
+ cp /usr/local/src/redis-5.0.5/utils/redis_init_script  /etc/init.d/redis
+
+vim /etc/init.d/redis
+1）在脚本的第一行后面添加一行内容如下：
+#chkconfig:2345 80 90  （如果不添加此内容注册的时候会提示：server redis does not support chkconfig）
+2）REDISPORT端口保持6379不变，（注意，端口名将与下面的配置文件名有关）
+3）EXEC=/usr/local/bin/redis-server 改为：EXEC=/usr/local/redis/bin/redis-server
+4）CLIEXEC=/usr/local/bin/redis-cli  改为：CLIEXEC=/usr/local/redis/bin/redis-cli
+5）CONF="/etc/redis/$(REDISPORT).conf" 改为： CONF="/usr/local/redis/conf/${REDISPORT}.conf"
+5）配置文件设置
+	创建redis配置文件目录
+mkdir -p /usr/local/redis/conf
+拷贝配置文件到conf目录并按端口号重命名为6379.conf  （为了方便做集群）
+cp /usr/local/src/redis-5.0.5/redis.conf  /usr/local/redis/conf/6379.conf
+
+6）更改redis开启的命令，以后台运行的方式执行：
+在$EXEC $CONF 后面添加：&  ，# （&表示以后台方式启动）
+
+添加为系统服务 
+chkconfig --add redis
+
+修改/usr/local/redis/conf/6379.conf文件
+daemonize no 将no 改为：yes      #不改的话不会生成pid文件
+pidfile /var/run/redis.pid   改为：pidfile /var/run/redis_6379.pid
+
+添加环境变量
+vim /etc/profile  末尾添加如下代码：
+#redis env
+export PATH=$PATH:/usr/local/redis/bin
+
+source  /etc/profile  使环境变量生效
+
+
+默认情况下，redis没有开启安全认证，可以通过/usr/local/redis/conf/6379.conf配置文件中的requirepass指定一个验证密码
+
+#requirepass foobared   改为：requirepass myPassword  （其中myPassword就是要设置的密码）
+
+END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

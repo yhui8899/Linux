@@ -1,0 +1,85 @@
+ 
+源码安装ruby
+下载：ruby-2.5.1.tar.gz
+wget https://cache.ruby-lang.org/pub/ruby/2.5/ruby-2.5.1.tar.gz
+tar -xf ruby-2.5.1.tar.gz
+cd ruby-2.5.1
+./configure --prefix=/usr/local/ruby
+make && make install
+配置环境变量：
+在/etc/profile文件末尾的加入：
+export PATH=$PATH:/usr/local/ruby/bin:
+刷新一下使环境变量生效：
+source  /etc/profile
+查看ruby版本：
+ruby -v
+#ruby 2.5.1p57 (2018-03-29 revision 63029) [x86_64-linux] 表示成功
+
+
+
+gem install redis  
+报错：
+ERROR:  Loading command: install (LoadError)
+        cannot load such file -- zlib
+ERROR:  While executing gem ... (NoMethodError)
+    undefined method `invoke_with_build_args' for nil:NilClass
+
+解决方法：
+yum -y install zlib-devel
+cd /usr/local/src/ruby-2.5.1/ext/zlib
+执行 ruby ./extconf.rb、make 、make install命令。
+make时报错（chmod +x Makefile）:make: *** No rule to make target `/include/ruby.h', needed by `zlib.o'.  Stop.
+解决方法：
+更改Makefile文件， zlib.o: $(top_srcdir)/include/ruby.h  改成   zlib.o: ../../include/ruby.h；到这里就可以make成功了。
+make 
+make install
+
+
+
+[root@localhost zlib]# gem install redis
+报错如下：
+ERROR:  While executing gem ... (Gem::Exception)
+    Unable to require openssl, install OpenSSL and rebuild Ruby (preferred) or use non-HTTPS sources
+解决方法：安装OpenSSL
+wget https://www.openssl.org/source/openssl-1.0.2s.tar.gz
+tar -xf openssl-1.0.2s.tar.gz
+ ./config -fPIC --prefix=/usr/local/openssl enable-shared  
+ ./config -t  
+make && make install  
+
+cd /usr/local/src/ruby-2.5.1/ext/openssl 
+ruby extconf.rb --with-openssl-dir=/usr/local/openssl
+make
+报错：
+compiling openssl_missing.c
+make: *** No rule to make target `/include/ruby.h', needed by `ossl.o'.  Stop.
+解决方法：
+vim Makefile
+执行如下：
+:%s /\$(top_srcdir)\/include\/ruby.h/\..\/..\/include\/ruby.h/g
+
+make &&make install
+
+[root@localhost openssl]# gem install redis
+Fetching: redis-4.1.2.gem (100%)
+Successfully installed redis-4.1.2
+
+成功！
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
