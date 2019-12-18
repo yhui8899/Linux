@@ -1,0 +1,34 @@
+FROM centos:7
+MAINTAINER  xiaofeige
+
+RUN	 yum  install -y openssl-devel curl curl-devel gcc gcc-c++ libjpeg \
+	 libjpeg-devel  libpng  libpng-devel make  \
+	 freetype  freetype-devel  pcre  pcre-devel \
+	 libxslt  libxslt-devel  bzip2  bzip2-devel \
+	 libxml2 libxml2-devel wget net-tools && \
+	 rm -rf /var/cache/yum/*
+
+RUN	wget https://www.php.net/distributions/php-5.6.12.tar.gz && \
+	tar -xf php-5.6.12.tar.gz && \
+	cd php-5.6.12 && \
+	./configure --prefix=/usr/local/php --with-curl --with-freetype-dir \
+	--with-gd --with-gettext --with-iconv-dir --with-kerberos \
+	--with-libdir=lib64 --with-libxml-dir --with-mysqli --with-openssl \
+	--with-pcre-regex --with-pdo-mysql --with-pdo-sqlite --with-pear \
+	--with-png-dir --with-jpeg-dir --with-xmlrpc --with-xsl --with-zlib \
+	--with-bz2 --with-mhash --enable-fpm --enable-bcmath --enable-libxml \
+	--enable-inline-optimization --enable-gd-native-ttf --enable-mbregex \
+	--enable-mbstring --enable-opcache --enable-pcntl --enable-shmop \
+	--enable-soap --enable-sockets --enable-sysvsem \
+	--enable-sysvshm --enable-xml --enable-zip && \
+	make -j 4 && make install && \
+	cp php.ini-production /usr/local/php/lib/php.ini && \
+	cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf && \
+	cp sapi/fpm/php-fpm /usr/local/bin && \
+	sed -i '/cgi.fix_pathinfo=1/acgi.fix_pathinfo=0' /usr/local/php/lib/php.ini && \
+	cd ../ && rm -rf php-5.6.12 
+
+ENV	PATH $PATH:/usr/local/php/sbin
+WORKDIR /usr/local/php
+EXPOSE	9000
+CMD	php-fpm ;sleep 9999d
