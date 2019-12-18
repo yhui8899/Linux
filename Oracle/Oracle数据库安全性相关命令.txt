@@ -1,0 +1,67 @@
+1) 查看是否启用口令复杂度函数：
+select limit from dba_profiles where profile='DEFAULT' and resource_name='PASSWORD_VERIFY_FUNCTION';
+2）检查utlpwdmg.sql中“-- Check for the minimum length of the password”部分中“length(password)<“后的值
+3）或者：查看口令管理制度以及执行记录，并选择验证。
+
+1）执行：select limit from dba_profiles where profile='DEFAULT' and resource_name='FAILED_LOGIN_ATTEMPTS';
+2）执行：select limit from dba_profiles where profile='DEFAULT' and resource_name='PASSWORD_LOCK_TIME';
+
+
+1）查看initSID.ora（%ORACLE_HOME\db_1\database）中REMOTE_OS_AUTHENT的赋值，
+ 2）或者：查看listener.ora(%ORACLE_HOME \db_1\NETWORK\ADMIN)文件中的“LISTENER”-"DESCRIPTION"-"ADDRESS_LIST"-"ADDRESS"-"PROTOCOL"项目的赋值
+或者：
+3）SQLPLUS: show parameter remote_login_passwordfile
+
+
+1）select username from dba_users;
+
+
+1）查看用户帐户及其当前状态：
+select username,account_status from dba_users;
+
+2）查看特定用户被授予的角色及其系统特权：
+select * from dba_role_privs where grantee='SCOTT'(某个用户具有的角色);
+select * from dba_sys_privs where grantee='SCOTT';（角色包含的系统权限）
+select * from dba_tab_privs where grantee='SCOTT';（角色包含的对象权限）
+
+3）查看特定角色的角色、系统特权以及对象特权：
+select * from role_role_privs where role='DBA';
+select * from role_sys_privs where role='DBA';
+select * from role_tab_privs where role='DBA';
+
+1）在sqlplus中执行命令：select username,account_status from dba_users;
+
+
+1）执行：select value from v$parameter where name='audit_trail';
+
+1）show parameter audit_trail;
+2）show parameter audit_sys_operations;
+3）select sel,upd,del,ins,gra from dba_obj_audit_opts;
+4）select user_name, proxy_name, audit_option from dba_stmt_audit_opts;
+5）select user_name, proxy_name, privilege from dba_priv_audit_opts;
+
+
+
+查看服务器端sqlnet.ora中以下参数：
+1）tcp.validnode_checking
+2）tcp.invited_nodes
+
+
+查看是否启用资源限制：
+1）show parameter resource_limit
+
+查看空闲超时设置：
+2）select limit from dba_profiles where profile='DEFAULT' and resource_name='IDLE_TIME';
+
+1）确定用户使用的profile：
+select username,profile from dba_users; 
+针对指定用户的profile，查看其限制（以default为例）：
+2）select limit from dba_profiles where profile='DEFAULT' and resource_name='SESSIONS_PER_USER'; 
+3）select limit from dba_profiles where profile='DEFAULT' and resource_name='SESSIONS_PER_USER'; 
+4）select limit from dba_profiles where profile='DEFAULT' and resource_name='IDLE_TIME';  
+
+输入命令：SQL>select * from v$version；
+   查看补丁select * from product_component_version;
+
+
+
