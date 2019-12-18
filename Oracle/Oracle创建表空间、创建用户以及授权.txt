@@ -1,0 +1,75 @@
+Oracle安装完后，其中有一个缺省的数据库，除了这个缺省的数据库外，我们还可以创建自己的数据库。
+
+    对于初学者来说，为了避免麻烦，可以用'Database Configuration Assistant'向导来创建数据库。
+
+创建完数据库后，并不能立即在数据库中建表，必须先创建该数据库的用户，并且为该用户指定表空间。
+
+关系：一个大的数据中分为几个表空间，创建几个用户然后指定对应的表空间并授权，这样用户就独立操作自己的资源了，每每用户登录进入后，在自己的表空间中新建表啊等等对象，互不干扰。
+
+    下面是创建数据库用户的具体过程：
+
+ 
+
+1.假如现在已经建好名为'NewDB'的数据库
+
+此时在D:appAdministratororadata目录下已经存在NewDB目录（注意：我的Oracle11g安装在D盘下，若你的Oracle安装在别的目录，那么你新建的数据库目录就在*:appAdministratororadata目录下）。
+
+ 
+
+2.创建用户之前要创建"临时表空间"，若不创建则默认的临时表空间为temp。
+
+create temporary tablespace user_temp  tempfile '/data/u01/app/oracle/oradata/orcl/yhui8899_temp.dbf'	
+size 50m
+autoextend on
+next 50m maxsize 2048m
+extent management local;	
+ 
+
+3.创建用户之前先要创建数据表空间，若没有创建则默认永久性表空间是system。
+
+create tablespace yhui8899
+logging
+datafile '/data/u01/app/oracle/oradata/orcl/yhui8899.dbf'
+size 50m
+autoextend on
+next 50m maxsize 20480m
+extent management local;
+
+其中'DB_DATA'和'DB_TEMP'是你自定义的数据表空间名称和临时表空间名称，可以任意取名；'D:appAdministratororadataNewDBDB_DATA.DBF'是数据文件的存放位置，'DB_DATA.DBF'文件名也是任意取；'size 32M'是指定该数据文件的大小，也就是表空间的大小。
+
+ 
+
+4.现在建好了名为'DB_DATA'的表空间，下面就可以创建用户了：
+
+create user xiaofeige identified by 88888888
+default tablespace  yhui8899
+temporary tablespace yhui8899_temp;
+
+
+默认表空间'DEFAULT TABLESPACE'使用上面创建的表空间名：DB_DATA。
+
+临时表空间'TEMPORARY TABLESPACE'使用上面创建的临时表空间名:DB_TEMP。
+
+ 
+
+5.接着授权给新建的用户：
+
+SQL> grant connect,resource,dba to xiaofeige;  --表示把 connect,resource权限授予xiaofeige用户
+
+SQL> grant dba to xiaofeige;  --表示把 dba权限授予给xiaofeige用户
+
+    授权成功。
+
+    OK! 数据库用户创建完成，现在你就可以使用该用户创建数据表了！
+
+ 
+
+总结：创建用户一般分四步：
+
+第一步：创建临时表空间
+
+第二步：创建数据表空间
+
+第三步：创建用户并制定表空间
+
+第四步：给用户授予权限

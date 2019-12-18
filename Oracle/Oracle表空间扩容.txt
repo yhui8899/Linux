@@ -1,0 +1,13 @@
+一、查询表空间剩余容量和总容量：
+select ef.tablespace_name, round(ef.used_space/(1024*1024)) used_space, round(fs.total_space/(1024*1024)) total_space, round(ef.used_space/fs.total_space*100,2) used_rate, round((fs.total_space-ef.used_space)/fs.total_space*100,2) free_rate from (select cf.tablespace_name,sum(df.bytes - cf.free_bytes) used_space from(select tablespace_name, file_id, sum(bytes) free_bytes from dba_free_space group by tablespace_name, file_id ) cf,dba_data_files df where cf.tablespace_name = df.tablespace_name and cf.file_id = df.file_id group by cf.tablespace_name) ef,( select tablespace_name, sum(case when autoextensible='YES' then maxbytes else bytes end) total_space from dba_data_files group by tablespace_name) fs where ef.tablespace_name = fs.tablespace_name;
+
+二、查看表空间的名字及文件所在位置：
+select tablespace_name, file_id, file_name,round(bytes/(1024*1024),0) total_space from dba_data_files order by tablespace_name；
+
+三、增大所需表空间大小：
+
+alter database datafile '表空间位置'resize 新的尺寸。
+例如：alter database datafile '\oracle\oradata\anita_2008.dbf' resize 4000m。
+
+四、设置表空间自动扩展：
+alter database datafile '\oracle\oradata\anita_2008.dbf' autoextend on next 100m maxsize 10000m
