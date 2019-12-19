@@ -31,6 +31,7 @@ if [[ ! -f ${SYSCTL_DIR}sysctl.conf ]];then
 fi
 
 \cp ${SYSCTL_DIR}sysctl.conf ${SYSCTL_DIR}sysctl.conf.bak
+ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 cat >${SYSCTL_DIR}sysctl.conf <<EOF
 net.ipv4.ip_forward = 0
