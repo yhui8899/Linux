@@ -110,4 +110,5 @@ e066cc945b06: Pushed
 v1: digest: sha256:c23221048276dfbdf31cf026e868f172f6fb7285651a1c654c3b39171f939377 size: 952
 ```
 
+
 看大上面信息表示push成功；
