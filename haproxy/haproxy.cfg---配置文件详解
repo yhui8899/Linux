@@ -1,0 +1,56 @@
+
+
+global				#全局配置
+
+	log 127.0.0.1 local3 info			#日志配置
+	maxconn 4096						#最大连接限制（优先级低）
+	uid nobody							#用户
+	gid nobody						 	#用户组
+	daemon								#守护进程运行
+	nbproc 1							#haproxy进程数
+
+
+
+defaults						#针对（listen和backend块进行设置如果块中没设置，则使用默认，针对后端服务器配置）
+
+	log  global					#日志使用全局配置
+	mode	http				#模式7层LB
+	maxconn	2048				#最大连接数（优先级中）
+	retries	3					#健康检查，3此连接失败就认为服务不可用
+	option redispatch			#服务不可用后的操作，重定向到其他服务器
+	#stats uri /haproxy?stats		#状态模块功能开启
+	stats auth admin:123			#状态模块认证（用户名admin密码123）
+	contimeout 5000					#定义haproxy将客户端请求转发至后端服务，所等待的超时时长 （5000=5秒）
+	clitimeout 50000				#haproxy作为客户端，和后端服务器之间空闲连接的超时时间，到时候发送fin指令（四次挥手进行断开）
+	srvtimeout 50000				#haproxy作为服务器，和用户之间空闲连接的超时时间，到时候发送fin指令（四次挥手进行断开）
+	timeout connect 5s			#1.8.20新版本使用
+	timeout client 50s  		#1.8.20新版本使用
+	timeout server 50s			#1.8.20新版本使用
+
+
+
+
+frontend http-in			#前端配置快，面对用户侧，客户端
+
+	bind 0.0.0.0:80				#面对用户监听地址和端口
+	mode http					#http模式的LB
+	log global					#日志使用全局配置
+	option httplog				#默认日志格式非常简陋，仅包括原地址、目标地址和实例名称，而"option httplog"参数将会使得日志格式变得丰富许多，其通常包括但不限于HTTP请求，连接计时器、会话状态、连接数、捕获的首部及cookie、“frontend”、“backend”及服务器名称，当然也包括源地址和端口号等；
+	option httpclose			#haproxy会针对客户端的第一条请求的返回添加cookie并返回给客户端，客户端发送后续请求时会发送此cookie到haproxy，haproxy会针对此cookie分发到上次处理此请求的服务器上，如果服务器不能忽略此cookie值会影响处理结果，如果避免这种情况配置此选项，防止产生多余的cookie信息；
+	acl html url_reg -i \.html$				#1、访问控制列表名称html，规则要求访问以html结尾的URL时
+	use_backend html-server if html			#2、如果满足acl html规则，则推送给后端服务器html-server
+	default_backend html-server				#3、默认的后端服务器是 html-server
+
+
+backend  html-server						#后端服务器名称为：html-server
+		mode http							#模式为7层代理
+		balance roundrobin					#算法为轮询（rr）
+		option httpchk GET /index.html		#允许用http协议检查server的健康
+		cookie SERVERID insert indirect nocache			#在转发客户端请求时插入cookie再转给真实服务器，如果第二次访问就把cookie换掉；
+		server html-A 	192.168.199.100:80 weight 1  cookie 3	check  inter 2000  rise 2  fall  5			#对后端服务器的健康检查间隔为2000毫秒，连续2次健康检查成功，则认为是有效的，连续5次健康检查失败，则认为服务器宕机
+		server html-B	192.168.199.101:80 weight 1  cookie 4 	check  inter 2000  rise 2  fall  5			#对后端服务器的健康检查间隔为2000毫秒，连续2次健康检查成功，则认为是有效的，连续5次健康检查失败，则认为服务器宕机
+
+#http://192.168.199.20/haproxy?stats		#haproxy后台监控地址
+
+
+
