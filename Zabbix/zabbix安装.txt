@@ -1,0 +1,103 @@
+Zabbix监控平台部署
+
+安装zabbix-server
+下载zabbix软件包：
+wget  http://sourceforge.net/projects/zabbix/files/ZABBIX%20Latest%20Stable/3.2.6/zabbix-3.2.6.tar.gz/download
+
+安装需要用到的软件包：
+yum -y  install  curl  curl-devel  net-snmp net-snmp-devel  perl-DBI  mariadb-devel mysql-devel 
+
+创建zabbix用户：
+groupadd  zabbix
+useradd  -g  zabbix  zabbix
+usermod  -s  /sbin/nologin  zabbix
+===========================================================================================
+
+创建zabbix数据库，执行授权命令：
+create  database  zabbix  charset=utf8；
+grant all on zabbix.* to zabbix@localhost identified by '123456'；
+flush privileges；
+
+===========================================================================================
+解压zabbix软件包并将Zabbix基础SQL文件导入数据至Zabbix数据库：
+tar   zxvf  zabbix-3.2.6.tar.gz
+cd   zabbix-3.2.6
+mysql -uzabbix -p123456 zabbix <database/mysql/schema.sql
+mysql -uzabbix -p123456 zabbix <database/mysql/images.sql
+mysql -uzabbix -p123456 zabbix < database/mysql/data.sql
+
+===========================================================================================
+切换至Zabbix解压目录，执行如下代码，安装Zabbix_server
+./configure --prefix=/usr/local/zabbix/ --enable-server --enable-agent --with-mysql --enable-ipv6 --with-net-snmp --with-libcurl
+make 
+make  install
+ln -s /usr/local/zabbix/sbin/zabbix_*  /usr/local/sbin/
+
+===========================================================================================
+备份Zabbix server配置文件，代码如下：
+cp  zabbix_server.conf  zabbix_server.conf.bak
+
+将zabbix_server.conf配置文件中代码设置为如下：
+LogFile=/tmp/zabbix_server.log
+DBHost=localhost
+DBName=zabbix
+DBUser=zabbix
+DBPassword=123456
+
+=============================================================================================
+
+同时cp zabbix_server启动脚本至/etc/init.d/目录，启动zabbix_server, Zabbix_server默认监听端口为10051。
+cd  zabbix-3.2.6
+cp  misc/init.d/tru64/zabbix_server  /etc/init.d/zabbix_server
+chmod  o+x  /etc/init.d/zabbix_server
+
+=============================================================================================
+配置Zabbix interface Web页面，安装HTTP WEB服务器，将Zabbix WEB代码发布至Apache默认发布目录 （请安装PHP5.4以上版本）
+
+cp -a   /usr/src/zabbix-3.2.6/frontends/php/*    /usr/local/apache2/htdocs/
+sed    -i   '/date.timezone/i date.timezone = PRC'   /etc/php.ini
+
+=============================================================================================
+重新启动Zabbix Server、HTTP、MYSQL服务，代码如下：
+
+/etc/init.d/zabbix_server  restart
+/etc/init.d/httpd     restart 
+/etc/init.d/mysqld   restart
+
+
+==============================================================================================
+
+Zabbix WEB GUI安装配置
+
+通过浏览器Zabbix_WEB验证，通过浏览器访问http://192.168.199.10/
+
+==============================================================================================
+
+安装agent：
+解压zabbix-3.2.6.tar.gz源码文件，切换至解压目录，编译安装Zabbix，命令如下：
+	./configure  --prefix=/usr/local/zabbix  --enable-agent
+	make
+	make install
+	ln  -s  /usr/local/zabbix/sbin/zabbix_*  /usr/local/sbin/
+================================================================================================
+创建zabbix用户：
+	groupadd  zabbix
+	useradd  -g  zabbix  zabbix
+	usermod  -s  /sbin/nologin  zabbix
+
+================================================================================================
+修改zabbix_agentd.conf客户端配置文件，执行如下命令，zabbix_agentd.conf内容，指定server IP，同时设置本地Hostname为本地IP地址或者DNS名称
+
+	LogFile=/tmp/zabbix_agentd.log
+	Server=192.168.199.10
+	ServerActive=192.168.199.10
+	Hostname = 192.168.199.11
+
+=================================================================================================
+同时cp zabbix_agentd启动脚本至/etc/init.d/目录，启动zabbix_agentd服务即可， Zabbix_agentd默认监听端口为10050。
+	cd zabbix-3.2.6
+	cp misc/init.d/tru64/zabbix_agentd /etc/init.d/zabbix_agentd
+	chmod o+x /etc/init.d/zabbix_agentd
+	/etc/init.d/zabbix_agentd  start
+==============================================================================================
+
