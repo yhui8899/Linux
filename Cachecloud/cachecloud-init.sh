@@ -5,7 +5,7 @@
 #	- 1. create user;
 #	- 2. create default directories and authorize;
 #	- 3. @usage: sh cachecloud-init.sh [username]
-# @author: leifu
+# @author: xiaofeige
 # @time: 
 ###########################################################################
 
