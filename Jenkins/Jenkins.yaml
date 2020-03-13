@@ -93,6 +93,8 @@ Add Transfer Set：增加一个配置
 
 ### 更换源地址：
 
+在Jenkins主页面找到：Manage Jenkins-->Plugin Manager--->Advanced--->Update Site--->替换原来的URL地址--->Submit--->Check now 即可；
+
 ```
 https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json
 
