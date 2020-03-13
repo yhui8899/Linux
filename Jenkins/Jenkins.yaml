@@ -1,13 +1,13 @@
 # Jenkins
-
 软件包下载：
 
-https://mirrors.tuna.tsinghua.edu.cn/jenkins/war-stable/2.107.1/jenkins.war
+wget -c https://mirrors.tuna.tsinghua.edu.cn/jenkins/war-stable/2.107.1/jenkins.war
 
-使用tomcat启动，默认端口：8080
+启动方法一：使用tomcat启动，默认端口：8080  
 
-直接使用java加参数启动：java -jar jenkins.war --httpPort=8080
+启动方法二： java -jar jenkins.war--httpPort=8888
 
+启动完成后在浏览器中访问：hhtp://ip:8080  根据提示完成后进入Jenkins页面； 
 ---------------------------
 
 ### 默认插件：
