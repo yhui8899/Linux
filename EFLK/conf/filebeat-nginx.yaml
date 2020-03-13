@@ -1,0 +1,25 @@
+filebeat.prospectors:
+- type: log
+  paths:
+    - /usr/local/nginx/logs/access.log
+  # tags: ["access"]
+  fields:
+    app: www
+    type: nginx-access
+  fields_under_root: true
+  
+- type: log
+  paths:
+    - /usr/local/nginx/logs/error.log
+  # ags: ["error"]
+  fields:
+    app: www
+    type: nginx-error
+  fields_under_root: true
+
+output.redis:
+  hosts: ["192.168.0.215"]
+  password: "123456"
+  key: "filebeat"
+  db: 0
+  datatype: list
