@@ -1,0 +1,107 @@
+配置安装JDK：
+export JAVA_HOME=/usr/local/jdk/  
+export CLASSPATH=$CLASSPATH:$JAVA_HOME/lib:$JAVA_HOME/jre/lib
+export PATH=$JAVA_HOME/bin:$JAVA_HOME/jre/bin:$PATH:$HOME/bin
+
+下载安装maven：
+wget -c http://apache.fayea.com/maven/maven-3/3.0.5/binaries/apache-maven-3.0.5-bin.zip
+unzip apache-maven-3.6.2-bin.zip 
+mv apache-maven-3.6.2 /usr/local/maven
+配置环境变量：
+export M2_HOME=/usr/local/maven
+export PATH=$PATH:$M2_HOME/bin
+
+source /etc/profile
+
+下载cachecloud
+git clone https://github.com/sohutv/cachecloud.git
+cp -r cachecloud  /usr/local/
+
+安装mariadb数据库：
+yum install mariadb mariadb-server mariadb-devel -y
+mysqladmin  -uroot   password 123456  #设置root密码
+create database cachecloud charset=utf8;
+grant all privileges on cachecloud.* to 'admin'@'localhost' identified by 'admin';
+grant all privileges on cachecloud.* to 'admin'@'127.0.0.1' identified by 'admin';
+导入数据库：
+source /usr/local/cachecloud/script/cachecloud.sql
+
+修改配置文件1：
+vim /usr/local/cachecloud/cachecloud-open-web/src/main/swap/online.properties
+cachecloud.db.url = jdbc:mysql://127.0.0.1:3306/cachecloud
+cachecloud.db.user = admin
+cachecloud.db.password = admin
+cachecloud.maxPoolSize = 20
+
+isClustered = true
+isDebug = false
+spring-file=classpath:spring/spring-online.xml
+log_base=/opt/cachecloud-web/logs
+web.port=8585
+log.level=WARN
+
+修改配置文件2：
+vim /usr/local/cachecloud/cachecloud-open-web/src/main/swap/local.properties
+cachecloud.db.url = jdbc:mysql://127.0.0.1:3306/cachecloud
+cachecloud.db.user = admin
+cachecloud.db.password = admin
+cachecloud.maxPoolSize = 20
+
+isClustered = true
+isDebug = true
+spring-file = classpath:spring/spring-local.xml
+log_base = /opt/cachecloud-web/logs
+web.port = 9999
+log.level = INFO
+
+项目打包发布(如有修改从新打包)
+cd  /usr/local/cachecloud
+mvn clean compile install -Ponline  
+
+mkdir -p /opt/cachecloud-web
+cp cachecloud-open-web/target/cachecloud-open-web-1.0-SNAPSHOT.war /opt/cachecloud-web/
+cp cachecloud-open-web/src/main/resources/cachecloud-web.conf /opt/cachecloud-web/
+ln -s /opt/cachecloud-web/cachecloud-open-web-1.0-SNAPSHOT.war  /etc/init.d/cachecloudweb
+
+如果想在linux上使用生产环境部署CacheCloud,执行deploy.sh脚本（cachecloud/script目录下）
+     例如当前cachecloud根目录在/data下，执行如下操作即可:
+     sh deploy.sh /data
+     deploy.sh脚本会将编译后的CacheCloud工程包、配置、启动脚本拷贝到/opt/cachecloud-web目录下。
+     当一切都准备好之后，可以执行sh /opt/cachecloud-web/start.sh 来启动CacheCloud:
+     sh /opt/cachecloud-web/start.sh
+     启动后可以执行如下操作观察启动日志：
+     tail -f /opt/cachecloud-web/logs/cachecloud-web.log
+cd /usr/local/cachecloud/script
+执行脚本：sh -x deploy.sh /usr/local/
+实际脚本执行了如下命令：
++ cachecloud_dir=/usr/local/
++ base_dir=/opt/cachecloud-web
++ mkdir -p /opt/cachecloud-web
++ mkdir -p /opt/cachecloud-web/logs
++ cp /usr/local//cachecloud/script/start.sh /opt/cachecloud-web
++ cp /usr/local//cachecloud/script/stop.sh /opt/cachecloud-web
++ cp /usr/local//cachecloud/cachecloud-open-web/target/cachecloud-open-web-1.0-SNAPSHOT.war /opt/cachecloud-web
++ cp /usr/local//cachecloud/cachecloud-open-web/src/main/resources/cachecloud-web.conf /opt/cachecloud-web/cachecloud-open-web-1.0-SNAPSHOT.conf
+
+切换目录：
+cd /opt/cachecloud-web/
+启动cachecloud
+sh -x start.sh
+查看是否有8585和2000端口：
+netstat -tnlp|grep -E "8585|2000"
+tcp        0      0 0.0.0.0:8585            0.0.0.0:*               LISTEN      10981/java          
+tcp        0      0 0.0.0.0:2000            0.0.0.0:*               LISTEN      10981/java 
+有如上两个端口说明启动成功
+
+使用浏览器访问：http://192.168.83.138:8585
+用户名密码：admin
+
+
+Redis 机器环境初始化：
+对于环境初始化的脚本，最好使用root 用户去执行。也就是将/usr/local/cachecloud/script/cachecloud-init.sh 拷贝到 /root/ 目录下，然后执行 sh cachecloud-init.sh cachecloud,然后会提示输入密码， 这里使用的是cachecloud用户，这里面的脚本也很简单，主要完成了下面几项工作。
+
+创建 cachecloud 用户；
+初始化 cachecloud 工作空间和授权；
+安装Redis（redis3.0.7）。
+
+脚本执行后，会提示输入密码，这里面的密码每台机器都是相同的，然后配置在 “系统配置管理”
