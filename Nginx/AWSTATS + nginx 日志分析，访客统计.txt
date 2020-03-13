@@ -1,0 +1,164 @@
+
+AWSTATS + nginx 日志分析，访客统计 
+
+
+1， 更改nginx日志格式
+
+log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+
+'$status $body_bytes_sent "$http_referer" '
+
+'"$http_user_agent" "$http_x_forwarded_for" '
+
+'$upstream_addr $upstream_cache_status $upstream_response_time';
+
+ 
+
+ 
+
+ 
+
+ 
+
+1， yum install GeoIP GeoIP-devel perl-Geo-IP perl-CPAN
+
+2，wget http://www.cpan.org/authors/id/G/GA/GAAS/URI-1.60.tar.gz
+
+perl Makefile.PL
+
+make
+
+make install
+
+ 
+
+ 
+
+3， 下载awstats
+
+wget https://prdownloads.sourceforge.net/awstats/awstats-7.6.tar.gz
+
+tar zxf awstats-7.6.tar.gz
+
+mv awstats-7.6 /usr/local/awstats
+
+chown root:root -R /usr/local/awstats/
+
+cd /usr/local/awstats/tools/
+
+chmod +x /usr/local/awstats/tools/*.pl
+
+chmod +x /usr/local/awstats/wwwroot/cgi-bin/*.pl
+
+mkdir -p /usr/www/awstats
+
+ 
+
+ 
+
+./awstats_configure.pl
+
+LogFile="/home/yunwei/nginxlog/%YYYY-0%MM-0%DD-0/tomcat-wap.log"
+
+LoadPlugin="geoip GEOIP_STANDARD /usr/share/GeoIP/GeoIP.dat"
+
+LoadPlugin="geoip_city_maxmind GEOIP_STANDARD /usr/share/GeoIP/GeoLiteCity.dat"
+
+LoadPlugin="decodeutfkeys"
+
+LoadPlugin="qqhostinfo"
+
+SiteDomain="betam.sandegy.com"
+
+HostAliases="betam.sandegy.com www.betam.sandegy.com 127.0.0.1 localhost"
+
+DirData="/usr/www/awstats/wap"
+
+ 
+
+ 
+
+更新City
+
+wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
+ 
+
+
+
+4，下载awstats纯真IP数据库解析插件，下载地址如下：
+
+http://down.51cto.com/data/1888530
+
+注意，附件qqhostinfo.pm、qqwry.pl里的文件路径已经修改好。
+
+下载完毕后，把qqhostinfo.pm、qqwry.pl、qqwry.dat这三个文件，放到awstats的wwwroot/cgi-bin/plugins目录下，并且给予qqhostinfo.pm文件可执行权限
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+5，生成数据
+
+/usr/local/awstats/wwwroot/cgi-bin/awstats.pl -update -config=betam.sandegy.com
+
+/usr/local/awstats/tools/awstats_buildstaticpages.pl -update -config=betam.sandegy.com -lang=cn -dir=/usr/www/awstats/wap -awstatsprog=/usr/local/awstats/wwwroot/cgi-bin/awstats.pl
+ 
+ 
+ 
+6，脚本
+
+#!/bin/bash
+
+#
+
+# this script run awstats log files analyzer tool
+
+#
+
+# 00 04 * * * /bin/bash /data/cron/awstats.sh
+
+# sites separated by space
+
+SITES="api.sandegy.com"
+
+DATADIR="/usr/www/awstats/api"
+
+YESTERDAY_MONTH=`date -d yesterday +%m`
+
+TODAY_MONTH=`date -d today +%m`
+
+/usr/local/awstats/wwwroot/cgi-bin/awstats.pl -update -config=$SITES
+
+if [[ $YESTERDAY_MONTH -eq $TODAY_MONTH ]]; then
+
+        /usr/local/awstats/tools/awstats_buildstaticpages.pl -update -config=$SITES -lang=cn -dir=$DATADIR -awstatsprog=/usr/local/awstats/wwwroot/cgi-bin/awstats.pl
+
+fi
+
+if [[ $YESTERDAY_MONTH -gt $TODAY_MONTH ]]; then
+
+        /usr/local/awstats/tools/awstats_buildstaticpages.pl -update -config=$SITES -lang=cn -dir=$DATADIR -awstatsprog=/usr/local/awstats/wwwroot/cgi-bin/awstats.pl -year=$(date -d yesterday +%d) -month=${YESTERDAY_MONTH}
+
+fi
+
+if [[ $YESTERDAY_MONTH -lt $TODAY_MONTH ]]; then
+
+        /usr/local/awstats/tools/awstats_buildstaticpages.pl -update -config=$SITES -lang=cn -dir=$DATADIR -awstatsprog=/usr/local/awstats/wwwroot/cgi-bin/awstats.pl -month=${YESTERDAY_MONTH}
+
+fi
+ 
+
+
+ 
+
+访问
+
+http://192.168.6.37:8686/

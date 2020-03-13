@@ -1,0 +1,39 @@
+worker_processes 8;
+#启动工作进程，通常设置和CPU的数量相等
+
+worker_cpu_affinity  00000001   00000010   00000100   00001000  00010000  00100000  01000000 10000000
+#为每个进程分配CPU，上例中将8个进程分配到8个CPU，当热可以写多个，或者将一个进程分配到多个CPU。
+
+worker_rlimit_nofile 102400;
+#这个指令是指当一个nginx进程打开的最多文件描述符数目，理论值应该是最多打开文件数（ulimit -n）与nginx进程数相除，但是nginx分配请求并不是那么均匀，所以最好与ulimit -n的值保持一致。（）
+====================================================================================================
+
+curl -v http://192.168.199.11/index.html （可以打印出请求的全部过程，可以查看是用什么方式请求的，请求的方式有两种，1、get  2、post）
+
+client_header_buffer_size 4k 客户端请求头部的缓冲区大小，这个可以根据你的系统分页大小来设置，一般一个请求的头部大小不会超过1k，不过由于一般系统分页都要超过1k，所以这里设置分页大小。分页大小可以用命令getconfPAGESIZE取得；（一般配置4k就可以了）
+
+====================================================================================================
+负载均衡：
+upstream  jfedu_web {
+	server  192.168.199.12:80
+	server  192.168.199.13:80
+}
+
+server {
+	listen	80;
+	server_name  localhost;
+	index   index.html  index.htm;
+	location  /  {
+		proxy_pass   http://jfedu_web;
+}
+
+}
+
+
+
+
+proxy_set_header Host $host    表示设置代理的主机信息,我们请求的主机是host主机名 $host 代表域名变量，也就是说浏览器打开什么域名它就代表什么域名（这一条很重要，）
+
+proxy_set_header 	X-Real-IP 	$remote_addr;	设置获取到浏览器的IP地址，获取客户端的ip（记录nginx前端的ip地址）前端就是在nginx前面的主机，后端就是在nginx后面的主机	
+#proxy_set_header 	X-Forwarded-For	$proxy_add_x_forwarded_for;	
+proxy_pass   http://jfedu_web;	
