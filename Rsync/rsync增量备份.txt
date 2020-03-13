@@ -1,0 +1,115 @@
+安装xinetd和rsync
+yum install xinetd rsync -y
+
+1、编辑/etc/rsyncd.conf文件（etc目录不存在的话，需要手动创建）配置如下：
+
+uid = root 
+gid = root 
+max connections = 0 
+pid file = /var/log/rsync/rsyncd.pid 
+lock file = /var/log/rsync/rsync.lock
+log file = /var/log/rsync/rsyncd.log
+#同步模块配置
+path = /data/mysql
+comment = turbomail backup accounts 
+ignore errors
+read only = false
+list = false 
+host allow = 192.168.0.46 
+auth users = tongbu
+secrets file = /etc/rsyncd.scrt
+
+配置参数说明：
+#全局参数设置:这部分设置的参数影响整个程序的运行
+
+uid = root                           #rsync运行时的用户ID (关于用户ID和用户组ID的设置只要保证具有读取要同步文件和文件夹的权限即可)
+
+gid = root                           #rsync运行时的用户组ID
+
+max connections = 0         #同时最大的连接数,0为不限制
+
+pid file = /var/log/rsync/rsyncd.pid     #记录rsync运行时的进程ID
+
+lock file = /var/log/rsync/rsync.lock    #以文件的方式锁的方式，保证rsync的一次运行
+
+log file = /var/log/rsync/rsyncd.log     #rsync日志信息包括启动信息同步信息等
+
+#port = 9834      #可以指定rsync运行时使用的端口，默认使用873(不指定则使用默认)
+
+
+#同步模块配置
+path = /root/turbomail/accounts       #指定要同步的具体文件夹，此处为实际同步的文件夹,我们指定的为accouts
+
+comment = turbomail backup accounts    备注信息,主要是一些说明信息，用来帮助记忆等
+
+ignore errors    #忽略一些无关的错误信息
+
+read only = false   #是否设置以只读的方式运行,本工具支持对外同步和回传哟
+
+list = false   #是否允许客户端查看文件列表
+
+host allow = 192.168.0.46    #允许同步的客户机IP,多个用","隔开
+
+auth users = turbomail    #同步认证时使用的用户名,可以任意指定，但必需存在于下一项的密码文件中
+
+secrets file = /etc/rsyncd.scrt    #密码认证文件,此文件中包含客户端认证时的用户名和密码的对应关系 ,配置文件名可以任意
+
+
+
+2、编辑密码文件:/etc/rsyncd.scrt（不存在则手动创建）
+vim /etc/rsyncd.scrt
+tongbu:123456
+
+配置rsync服务运行。先安装xinetd，执行yum install xinetd -y
+
+配置文件：vim /etc/xinetd.d/rsync
+
+service rsync
+{
+        disable = no
+        flags             = IPv6
+        socket_type   = stream
+        wait               = no
+        user               = root
+        server            = /usr/bin/rsync
+        server_args   	= --daemon
+        log_on_failure  += USERID
+}
+
+
+4、运行rsync服务
+service xinetd start
+
+查看rsync端口：
+[root@xiaofeige ~]# netstat -antp|grep 873
+tcp6       0      0 :::873                  :::*                    LISTEN      15965/xinetd  
+看到如上信息表示rsync启动成功
+
+
+5、备份机器执行rsync同步命令：
+/usr/bin/rsync  -vlzrtogp --progress --delete root@172.17.0.1:/data/mysql/ /data/ 
+
+如果是本机则是：
+/usr/bin/rsync  -vlzrtogp --progress --delete  /data/mysql/ /data/ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
