@@ -252,6 +252,6 @@ ${mysql_bin}/mysql -u${user} -p${pass} --socket=${socket} -e "unlock tables"
 
  
 
- 
+
 
 find ${incr_dir} -name "*.sql" -type f -mtime +7 -exec rm -rf {} \;
