@@ -55,7 +55,7 @@ nihao
 
 ```
 1：/proc/sys/net/ipv4/tcp_tw_reuse （reuse复用socket）  
-#0：表示关闭，1表示开启：此参数可用打开，当此参数开启的时候tcp_timestamps时间戳必须要开启；
+#0：表示关闭，1表示开启：此参数可以打开，当此参数开启的时候tcp_timestamps时间戳必须要开启；
 
 2：/proc/sys/net/ipv4/tcp_timestamps（时间戳）  
 #0：表示关闭，1表示开启：默认是开启的， 如果这个时间戳关闭的话 reuse也必须关闭，因为reuse会调用这个时间戳来判断这个数据包是老的还是新的
