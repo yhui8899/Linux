@@ -2,7 +2,7 @@
 
 ```
 ---
-  - hosts: 192.168.83.131
+  - hosts: web
     remote_user: root
     tasks:
       - name: install lib package
