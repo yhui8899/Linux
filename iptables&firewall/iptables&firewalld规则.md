@@ -29,7 +29,7 @@ INPUT链：		处理来自外部的数据；
 
 OUTPUT链： 	处理向外发送的数据；
 
-FORWARD链： 	将数据转发到本机的其他网卡设备上。
+FORWARD链：    	将数据转发到本机的其他网卡设备上。
 
 PREROUTING链： 处理刚到达本机并在路由转发前的数据包。它会转换数据包中的目标IP地址（destination ip address），通常用于DNAT(destination NAT)。
 
@@ -39,10 +39,10 @@ POSTROUTING链：处理即将离开本机的数据包。它会转换数据包中
 ```
 #默认规则：
 *filter
-:INPUT ACCEPT [0:0]			#默认允许所有访问，生产环境一般只将input设为DROP,其他默认为：ACCEPT；
+:INPUT ACCEPT [0:0]		#默认允许所有访问，生产环境一般只将input设为DROP,其他默认为：ACCEPT；
 :FORWARD ACCEPT [0:0]		#默认允许所有转发；
-:OUTPUT ACCEPT [0:0]	    #默认允许所有从本机出去，如果设为DROP的话就需要配置两条规则，input和output规则；
-	#默认规则，优先级是最低的
+:OUTPUT ACCEPT [0:0]	    	#默认允许所有从本机出去，如果设为DROP的话就需要配置两条规则，input和output规则；
+#默认规则，优先级是最低的
 ```
 
 ------------------------
@@ -82,26 +82,26 @@ yum install iptable iptables-devel iptables-services iptables-utils -y
 -i 数据包进入的网卡
 -o 数据包出口的网卡
 module模块扩展匹配：
-	-m state --state   匹配状态的
-	-m mutiport --source-port   端口匹配 ,指定一组端口
-	-m limit --limit 3/minute   每三分种一次
-	-m limit --limit-burst  5   只匹配5个数据包
+	-m state --state   		匹配状态的
+	-m mutiport --source-port   	端口匹配 ,指定一组端口
+	-m limit --limit 3/minute   	每三分种一次
+	-m limit --limit-burst  5   	只匹配5个数据包
 	-m string --string --algo bm|kmp --string"xxxx"  匹配字符串
 	-mtime--timestart 8:00 --timestop 12:00  表示从哪个时间到哪个时间段
-	-mtime--days    表示那天
+	-mtime--days    表示哪天
 	-m mac --mac-source xx:xx:xx:xx:xx:xx 匹配源MAC地址
-	-m layer7 --l7proto qq   表示匹配腾讯qq的 当然也支持很多协议,这个默认是没有的,需要我们给内核打补丁并重新编译内核及iptables才可以使用 -m layer7 这个显示扩展匹配
+	-m layer7 --l7proto qq   	表示匹配腾讯qq的 当然也支持很多协议,这个默认是没有的,需要我们给内核打补丁并重新编译内核及iptables才可以使用 -m layer7 这个显示扩展匹配
 ----------------------------------------------------------
 3.动作：
 -j
-	DROP 直接丢掉
-	ACCEPT 允许通过
-	REJECT 丢掉，但是回复信息
-	LOG --log-prefix"说明信息,自己随便定义" ，记录日志
-	SNAT       源地址转换
-	DNAT       目标地址转换
-	REDIRECT   重定向
-	MASQUERAED  地址伪装
+	DROP 		直接丢掉
+	ACCEPT 		允许通过
+	REJECT 		丢掉，但是回复信息
+	LOG --log-prefix"	说明信息,自己随便定义" ，记录日志
+	SNAT       	源地址转换
+	DNAT       	目标地址转换
+	REDIRECT   	重定向
+	MASQUERAED  	地址伪装
 	保存iptables规则
 	service iptables save
 # 重启iptables服务
