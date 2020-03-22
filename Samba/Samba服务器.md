@@ -170,3 +170,6 @@ Encrypt passwords = yes    #加密密码
 
 
 systemctl restart smb   #重启Samba服务器
+----------------------------------------------------
+Linux挂载Samba：
+mount -t cifs //192.168.72.222/testadm_file -o username=smbtest,password=123
