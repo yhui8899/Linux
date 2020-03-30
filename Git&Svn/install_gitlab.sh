@@ -21,7 +21,7 @@ gitlab_url="https://mirrors.tuna.tsinghua.edu.cn/gitlab-ce/yum/el7/${gitlab_soft
 yum install ${LIB_PACK[@]} -y >>/dev/null 2>&1
 
 
-if [[ `ps -ef|grep -c gitlab` != "0" ]];then
+if [[ `ps -ef|grep -Ev "grep|$0"|grep -c gitlab` != "0" ]];then
 
 	echo -e "\033[33mPlease uninstall gitlab Retry\033[0m"
 
