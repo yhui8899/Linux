@@ -74,5 +74,4 @@ gitlab中生成秘钥认证
 
 4、gitlab上创建webhook填写job的URL和token （在gitlab的项目中添加）
 
-5、
 
