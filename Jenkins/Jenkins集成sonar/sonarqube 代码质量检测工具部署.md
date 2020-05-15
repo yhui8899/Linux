@@ -1,9 +1,13 @@
 # sonarqube 代码质量检测工具部署
 
-##### 下载sonarqube：
+##### 官方下载sonarqube：
 
 ```
 https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-7.0.zip
+```
+安装程序已上传到百度网盘地址如下：
+```
+链接：https://pan.baidu.com/s/1HhpZ-j9bbR86KPuxpZXHsg 密码：xxtx
 ```
 
 ##### 解压部署：
