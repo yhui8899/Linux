@@ -447,23 +447,30 @@ spec:
 
 ##### 镜像拉取策略：
 
-​		imagePullPolicy：IfNotPresent：Always：Never：  三种方式；
+imagePullPolicy：IfNotPresent：Always：Never：  三种方式；
+```
+Always：每次都下载最新的镜像
+
+Never：只使用本地镜像，从不下载
+
+IfNotPresent：只有当本地没有的时候才下载镜像
+```
 
 ##### 资源限制：
 
-​		requests：、limits： CPU、Memory
+requests：、limits： CPU、Memory
 
 ##### 重启策略：
 
-​		restartPolicy: Always、OnFailure、Never，	三种策略
+restartPolicy: Always、OnFailure、Never，	三种策略
 
 ##### 健康检查：
 
-​		livenessProbe、readinessProbe  两种类型；httpget 、exec、tcpSocket
+livenessProbe、readinessProbe  两种类型；httpget 、exec、tcpSocket
 
 ##### 调度约束：
 
-​		nodeName、nodeSelector	两种类型；
+nodeName、nodeSelector	两种类型；
 
 ##### 故障排查：
 
