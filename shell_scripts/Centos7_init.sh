@@ -80,10 +80,10 @@ fi
 
 check_limit=`grep "soft" ${LIMIT_DIR}limits.conf |grep -Ev "^#"|wc -l`
 if [[ ${check_limit} == 0 ]];then
-	echo '*     soft       noproc                 65535' >>${LIMIT_DIR}limits.conf
-	echo '*     hard       noproc                 65535' >>${LIMIT_DIR}limits.conf
-	echo '*     soft       nofile                 65535' >>${LIMIT_DIR}limits.conf
-	echo '*     hard       nofile                 65535' >>${LIMIT_DIR}limits.conf
+	echo '*     soft       noproc                 65536' >>${LIMIT_DIR}limits.conf
+	echo '*     hard       noproc                 65536' >>${LIMIT_DIR}limits.conf
+	echo '*     soft       nofile                 65536' >>${LIMIT_DIR}limits.conf
+	echo '*     hard       nofile                 65536' >>${LIMIT_DIR}limits.conf
 	echo -e "\033[32mulimit change Successfully\033[0m"
 else
 	echo -e "\033[33mulimit don't change\033[0m"
