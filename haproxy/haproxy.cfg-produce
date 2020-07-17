@@ -1,0 +1,83 @@
+global
+      log  127.0.0.1   local0
+      maxconn     5000
+      chroot      /usr/local/haproxy
+      pidfile     /var/run/haproxy.pid
+      stats socket /var/run/haproxy.stat mode 666 level user
+      stats bind-process 30
+      user        haproxy
+      group       haproxy
+      daemon
+      nbproc 30 
+      tune.ssl.default-dh-param 2048
+defaults
+      log       global
+      mode      http
+      option    httplog
+      option    dontlognull
+      option    redispatch
+      option    httpclose
+      option    forwardfor
+      option    http-server-close 
+      retries   3
+      maxconn   5000
+      timeout check   2s
+      timeout http-request    10s
+      timeout queue           30s
+      timeout connect         10s
+      timeout client          30s
+      timeout server          30s
+      timeout client-fin      10s
+      timeout server-fin      10s
+      timeout http-keep-alive 15s
+listen stats
+      mode http
+      bind 0.0.0.0:91
+      stats enable
+      stats uri /admin
+      stats realm "Admin console"
+      stats auth admin:sdha91
+      stats hide-version
+      stats refresh 10s
+      stats admin if TRUE
+
+frontend web80
+        mode http
+        bind *:80
+        bind *:443 ssl crt /usr/local/haproxy/ssl/sandegy/sandegykey.pem crt /usr/local/haproxy/ssl/qltshop/qltshopkey.pem crt /usr/local/haproxy/ssl/topsdc/topsdckey.pem ciphers HIGH:!aNULL:!MD5 
+        reqadd X-Forwarded-Proto:\ https
+
+        #acl ssl hdr_reg(host) -i ^(\.*.sandegy.com|\.*.topsdc.io)$
+#        redirect scheme https code 301 if !{ ssl_fc }
+
+        acl sandegy_ssl hdr_reg(host) -i \.*.sandegy.com
+        use_backend nginx_sandegy if sandegy_ssl
+        acl topsdc_ssl hdr_reg(host) -i \.*.topsdc.io
+        use_backend nginx_topsdc if topsdc_ssl
+        acl qltshop_ssl hdr_reg(host) -i \.*.qltshop.com
+        use_backend nginx_qltshop if qltshop_ssl
+
+frontend web8085
+        bind *:8085
+        mode http
+        default_backend soa_service
+
+backend nginx_sandegy
+        balance roundrobin
+        server ssl-6.36 192.168.6.36:80 weight 3 check inter 2000 rise 2 fall 1
+        server ssl-6.37 192.168.6.37:80 weight 3 check inter 2000 rise 2 fall 1
+
+backend nginx_qltshop
+        balance roundrobin
+        server ssl-6.36 192.168.6.36:80 weight 3 check inter 2000 rise 2 fall 1
+        server ssl-6.37 192.168.6.37:80 weight 3 check inter 2000 rise 2 fall 1
+
+backend nginx_topsdc
+        balance roundrobin
+        server ssl-6.36 192.168.6.36:80 weight 3 check inter 2000 rise 2 fall 1
+        server ssl-6.37 192.168.6.37:80 weight 3 check inter 2000 rise 2 fall 1
+
+backend soa_service
+        balance roundrobin
+        server nginx-6.36 192.168.6.36:8085 weight 3 check inter 2000 rise 2 fall 1
+        server nginx-6.37 192.168.6.37:8085 weight 3 check inter 2000 rise 2 fall 1
