@@ -213,7 +213,6 @@ zabbix_get -s 192.168.10.2 -k php-fpm_status[total_processes]
 
 关于zabbix监控php-fpm状态就到此结束；
 
-参考：https://blog.csdn.net/qq_31725371/article/details/94897779
 
 
 
