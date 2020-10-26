@@ -26,9 +26,7 @@ cd  /service/scripts/
 vim  tcp_status.sh
 
 ```shell
-# cat /etc/zabbix/scripts/tcp_status.sh 
 #!/bin/bash
-#
 [ $# -ne 1 ] && echo "Usage:CLOSE-WAIT|CLOSED|CLOSING|ESTAB|FIN-WAIT-1|FIN-WAIT-2|LAST-ACK|LISTEN|SYN-RECV SYN-SENT|TIME-WAIT" && exit 1
 tcp_status_fun(){
         TCP_STAT=$1
