@@ -125,15 +125,17 @@ spec:
 ## 三、健康检查（Probe）
 
 #### Probe有以下两种类型：
+```shell
 
-**livenessProbe：**
+livenessProbe：
 
 如果检查失败，将杀死容器，根据Pod的restartPolicy来操作。
 
-**readinessProbe：**	
+readinessProbe：	
 
 如果检查失败，Kubernetes会把Pod从service endpoints中剔除。
 
+```
 #### Probe支持以下三种检查方法：
 
 **httpGet**
