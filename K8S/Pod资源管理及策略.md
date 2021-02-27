@@ -138,18 +138,20 @@ readinessProbe：
 ```
 #### Probe支持以下三种检查方法：
 
-**httpGet**
+```shell
+httpGet
 
 发送HTTP请求，返回200-400范围状态码为成功。
 
-**exec**
+exec
 
 执行Shell命令返回状态码是0为成功。
 
-**tcpSocket**
+tcpSocket
 
 发起TCP Socket建立成功。
 
+```
 **查看endpoints**
 
 ```shell
