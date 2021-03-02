@@ -1,6 +1,7 @@
 # 								Ingress-nginx控制器
 
-**Ingress部署文档：**https://github.com/kubernetes/ingress-nginx/blob/master/docs/deploy/index.md
+
+Ingress部署文档：https://github.com/kubernetes/ingress-nginx/blob/master/docs/deploy/index.md
 
 
 ### 一、创建一个Ingress Controller控制器
