@@ -103,7 +103,7 @@ kubectl create -f registry-pull-secret.yaml
 registry-pull-secret                 kubernetes.io/dockerconfigjson     1    3m52s  #数据显示是1表示正常如果显示是0的话说明数据没保存进去
 ```
 
-创建tomcat-deployment
+创建tomcat-deployment和service
 
 vim tomcat-deployment.yaml
 
